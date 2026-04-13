@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cursed Coins ☽</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+/* ═══ RESET ════════════════════════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c8a84b;--gold2:#f0d080;--gold3:#8a6520;
+  --dark:#0d0a06;--dark2:#080604;--dark3:#1a1208;--dark4:#2a1f0e;
+  --stone:#2a2218;--stone2:#3d3020;
+  --blood:#8b0000;--blood2:#c0392b;
+  --text:#e8d5a0;--muted:#8a7a5a;--muted2:#5a4a2a;
+  --green:#2d6a2d;--green2:#4a9e4a;
+  --frame-silver:linear-gradient(135deg,#c0c0c0,#e8e8e8,#a0a0a0);
+  --frame-gold:linear-gradient(135deg,#c8a84b,#f0d080,#8a6520);
+  --frame-blood:linear-gradient(135deg,#8b0000,#c0392b,#6a0000);
+  --frame-arcane:linear-gradient(135deg,#6d28d9,#8b5cf6,#4c1d95);
+  --frame-inferno:linear-gradient(135deg,#c2410c,#f97316,#7c2d12);
+  --frame-void:linear-gradient(135deg,#0e7490,#06b6d4,#164e63);
+}
+html{height:100%;overflow:hidden}
+body{
+  font-family:'Crimson Text',Georgia,serif;
+  background:var(--dark2);color:var(--text);
+  height:100vh;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* ═══ BACKGROUND ═══════════════════════════════════════════════════════════ */
+#bg{
+  position:fixed;inset:0;z-index:0;
+  background:radial-gradient(ellipse 90% 60% at 50% 0%,#1a0a0012,transparent 70%),
+    radial-gradient(ellipse 50% 70% at 10% 90%,#0a0a1a18,transparent),
+    radial-gradient(ellipse 40% 40% at 90% 10%,#1a050018,transparent), #0d0a06;
+  overflow:hidden;
+}
+#bg::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23c8a84b' fill-opacity='0.025'%3E%3Cpath d='M40 0L80 40L40 80L0 40Z'/%3E%3C/g%3E%3C/svg%3E");
+}
+.candle{position:absolute;bottom:0;width:3px;border-radius:2px;
+  background:linear-gradient(to top,#c8a84b,#f0d08088,transparent);
+  animation:cflicker 3s ease-in-out infinite;}
+.candle::after{content:'';position:absolute;top:-14px;left:50%;
+  transform:translateX(-50%);width:10px;height:18px;
+  background:radial-gradient(ellipse at 50% 80%,#ffd700cc,#ff8c0077,transparent);
+  border-radius:50% 50% 30% 30%;animation:cflame 2.2s ease-in-out infinite;}
+@keyframes cflicker{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes cflame{0%,100%{transform:translateX(-50%) scaleY(1) rotate(-3deg)}50%{transform:translateX(-50%) scaleY(1.2) rotate(4deg)}}
+
+/* ═══ APP SHELL ════════════════════════════════════════════════════════════ */
+#app{position:relative;z-index:1;width:100%;max-width:1100px;
+  height:100vh;overflow:hidden;padding:0 16px;}
+.screen{display:none;height:100vh;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--gold3) transparent;
+  animation:fadeUp .45s ease;}
+.screen.active{display:flex;flex-direction:column;}
+.screen::-webkit-scrollbar{width:4px}
+.screen::-webkit-scrollbar-thumb{background:var(--gold3);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ COMMON COMPONENTS ════════════════════════════════════════════════════ */
+.panel{
+  background:linear-gradient(160deg,#1a1208cc,#0d0a06cc,#1a1208aa);
+  border:1px solid #c8a84b2a;border-radius:8px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 8px 40px #00000055,inset 0 1px 0 #c8a84b18;
+}
+.panel-inner-border{position:relative}
+.panel-inner-border::before{
+  content:'';position:absolute;inset:6px;border:1px solid #c8a84b15;
+  border-radius:5px;pointer-events:none;
+}
+
+h1.logo{
+  font-family:'Cinzel Decorative',serif;font-size:clamp(22px,4vw,38px);
+  letter-spacing:.06em;
+  background:linear-gradient(135deg,#8a6520,#c8a84b,#f0d080,#c8a84b,#8a6520);
+  background-size:200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 4s linear infinite;
+}
+@keyframes shimmer{0%{background-position:0%}100%{background-position:200%}}
+
+.btn{
+  padding:12px 22px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;
+  border-radius:4px;cursor:pointer;transition:all .25s;
+  border:1px solid var(--gold);color:var(--gold2);
+  background:linear-gradient(135deg,#c8a84b1a,#c8a84b08);
+  position:relative;overflow:hidden;white-space:nowrap;
+}
+.btn::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,#c8a84b18,transparent);
+  transition:left .4s;
+}
+.btn:hover::after{left:100%}
+.btn:hover{background:linear-gradient(135deg,#c8a84b30,#c8a84b15);
+  box-shadow:0 0 20px #c8a84b33;}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn.sm{padding:8px 16px;font-size:11px}
+.btn.danger{border-color:var(--blood2);color:#ff7070;
+  background:linear-gradient(135deg,#8b000018,#8b000008)}
+.btn.danger:hover{background:linear-gradient(135deg,#8b000030,#8b000015);
+  box-shadow:0 0 20px #8b000044}
+.btn.success{border-color:var(--green2);color:#80ff80;
+  background:linear-gradient(135deg,#2d6a2d18,#2d6a2d08)}
+.btn.success:hover{background:linear-gradient(135deg,#2d6a2d30,#2d6a2d15);
+  box-shadow:0 0 20px #2d6a2d44}
+
+.sec-title{
+  font-family:'Cinzel',serif;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,#c8a84b22,transparent)}
+
+.form-field{margin-bottom:14px}
+.form-field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;}
+.form-field input{
+  width:100%;padding:11px 14px;background:#0d0a0688;
+  border:1px solid #c8a84b2a;border-radius:4px;
+  color:var(--text);font-family:'Crimson Text',serif;font-size:15px;
+  outline:none;transition:border .25s,box-shadow .25s;
+}
+.form-field input:focus{border-color:var(--gold);box-shadow:0 0 14px #c8a84b22}
+
+.msg{font-size:13px;min-height:18px;margin-top:8px;font-style:italic}
+.msg.err{color:#ff7070}.msg.ok{color:#80ff80}.msg.info{color:var(--muted)}
+
+/* Avatar component */
+.avatar-wrap{position:relative;display:inline-block}
+.avatar-img{width:52px;height:52px;border-radius:50%;object-fit:cover;
+  background:var(--stone);display:block;}
+.avatar-img.lg{width:80px;height:80px}
+.avatar-frame{position:absolute;inset:-4px;border-radius:50%;pointer-events:none}
+.frame-silver .avatar-frame{background:var(--frame-silver);-webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%)}
+.frame-gold   .avatar-frame{background:var(--frame-gold);  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%)}
+.frame-blood  .avatar-frame{background:var(--frame-blood);  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%)}
+.frame-arcane .avatar-frame{background:var(--frame-arcane); -webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%);animation:arcaneGlow 2s ease-in-out infinite}
+.frame-inferno .avatar-frame{background:var(--frame-inferno);-webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%);animation:infernoGlow 1.5s ease-in-out infinite}
+.frame-void   .avatar-frame{background:var(--frame-void);  -webkit-mask:radial-gradient(circle at 50% 50%,transparent 45%,black 45%);animation:voidGlow 3s ease-in-out infinite}
+@keyframes arcaneGlow{0%,100%{filter:drop-shadow(0 0 6px #8b5cf6)}50%{filter:drop-shadow(0 0 14px #8b5cf6)}}
+@keyframes infernoGlow{0%,100%{filter:drop-shadow(0 0 8px #f97316)}50%{filter:drop-shadow(0 0 18px #f97316)}}
+@keyframes voidGlow{0%,100%{filter:drop-shadow(0 0 10px #06b6d4)}50%{filter:drop-shadow(0 0 22px #06b6d4)}}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:200;background:#000000aa;
+  backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center}
+.overlay.show{display:flex}
+.overlay-box{
+  background:linear-gradient(160deg,#1a1208,#0d0a06,#1a1208);
+  border:1px solid #c8a84b44;border-radius:8px;padding:44px;text-align:center;
+  max-width:420px;width:92%;
+  box-shadow:0 0 80px #c8a84b18,0 40px 100px #00000099;
+  animation:popIn .45s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.ov-icon{font-size:60px;display:block;margin-bottom:14px}
+.ov-title{font-family:'Cinzel Decorative',serif;font-size:22px;color:var(--gold);margin-bottom:8px}
+.ov-sub{color:var(--muted);font-style:italic;margin-bottom:26px}
+.ov-btns{display:flex;flex-direction:column;gap:10px}
+
+/* Toast */
+.toast{
+  position:fixed;top:18px;right:18px;z-index:300;
+  background:#1a1208f0;border:1px solid #c8a84b44;border-radius:5px;
+  padding:11px 18px;font-size:13px;max-width:280px;
+  box-shadow:0 8px 32px #00000066;animation:toastIn .3s ease;
+}
+@keyframes toastIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ═══ SCREEN: AUTH ═════════════════════════════════════════════════════════ */
+#authScreen{align-items:center;justify-content:center;padding:20px}
+.auth-box{
+  width:100%;max-width:400px;padding:48px;
+  text-align:center;
+}
+.auth-crown{font-size:48px;margin-bottom:6px;display:block;
+  filter:drop-shadow(0 0 14px #c8a84b88)}
+.auth-subtitle{color:var(--muted);font-style:italic;font-size:15px;margin-bottom:32px}
+.auth-tabs{display:flex;border:1px solid #c8a84b2a;border-radius:4px;
+  overflow:hidden;margin-bottom:24px}
+.auth-tab{flex:1;padding:10px;background:transparent;border:none;
+  font-family:'Cinzel',serif;font-size:13px;color:var(--muted);
+  cursor:pointer;transition:all .25s;letter-spacing:.05em;}
+.auth-tab.active{background:#c8a84b18;color:var(--gold2)}
+.auth-tab:hover:not(.active){background:#ffffff07}
+
+/* Verify step */
+#verifyStep{display:none}
+.code-inputs{display:flex;gap:8px;justify-content:center;margin:16px 0}
+.code-input{
+  width:46px;height:56px;border-radius:5px;
+  background:#0d0a0688;border:1px solid #c8a84b2a;
+  color:var(--gold2);font-family:'Cinzel Decorative',serif;font-size:22px;
+  text-align:center;outline:none;transition:border .2s,box-shadow .2s;
+}
+.code-input:focus{border-color:var(--gold);box-shadow:0 0 14px #c8a84b33}
+
+/* ═══ SCREEN: MENU ═════════════════════════════════════════════════════════ */
+#menuScreen{padding:20px 0;gap:20px}
+.menu-header{
+  padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.menu-user{display:flex;align-items:center;gap:14px}
+.menu-user-info .username{font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-bottom:2px}
+.menu-user-info .coins{font-size:13px;color:var(--muted)}
+.menu-user-info .coins span{color:var(--gold2);font-weight:600}
+.menu-nav{display:flex;gap:10px;flex-wrap:wrap}
+
+.menu-body{flex:1;display:grid;grid-template-columns:1fr 340px;gap:16px;min-height:0;padding:0}
+@media(max-width:720px){.menu-body{grid-template-columns:1fr}}
+
+/* Leaderboard */
+.lb-list{display:flex;flex-direction:column;gap:6px;max-height:calc(100vh - 220px);
+  overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold3) transparent}
+.lb-list::-webkit-scrollbar{width:3px}
+.lb-list::-webkit-scrollbar-thumb{background:var(--gold3)}
+.lb-row{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;
+  border-radius:5px;transition:background .2s;
+}
+.lb-row:hover{background:#c8a84b0a}
+.lb-rank{
+  font-family:'Cinzel Decorative',serif;font-size:13px;min-width:28px;text-align:center;
+  color:var(--muted);
+}
+.lb-rank.r1{color:#f0d080;text-shadow:0 0 10px #f0d08088}
+.lb-rank.r2{color:#c0c0c0}
+.lb-rank.r3{color:#cd7f32}
+.lb-name{flex:1;font-size:14px;font-family:'Cinzel',serif}
+.lb-wins{font-size:13px;color:var(--gold);min-width:50px;text-align:right}
+.lb-coins{font-size:12px;color:var(--muted);min-width:60px;text-align:right}
+
+/* Right panel */
+.menu-right{display:flex;flex-direction:column;gap:14px;min-height:0}
+.play-btn-wrap{padding:20px;text-align:center}
+.play-btn-wrap .btn{width:100%;padding:18px;font-size:16px;letter-spacing:.15em;
+  border-width:2px;}
+.play-btn-wrap p{color:var(--muted);font-style:italic;font-size:13px;margin-top:10px}
+
+/* ═══ SCREEN: SHOP ═════════════════════════════════════════════════════════ */
+#shopScreen{padding:20px 0;gap:16px}
+.shop-header{padding:16px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.shop-coins{font-family:'Cinzel',serif;font-size:16px;color:var(--gold)}
+.shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;padding:0}
+.frame-card{
+  padding:20px;text-align:center;border-radius:6px;cursor:pointer;
+  transition:all .3s;border:1px solid #c8a84b1a;
+  background:linear-gradient(160deg,#1a120888,#0d0a0688);
+}
+.frame-card:hover:not(.owned-equipped){
+  border-color:#c8a84b55;box-shadow:0 0 20px #c8a84b18;transform:translateY(-3px)
+}
+.frame-preview{
+  width:80px;height:80px;border-radius:50%;margin:0 auto 14px;
+  background:var(--stone);display:flex;align-items:center;justify-content:center;
+  font-size:28px;position:relative;
+}
+.frame-preview .ring{
+  position:absolute;inset:-5px;border-radius:50%;
+  border:3px solid transparent;
+}
+.frame-name{font-family:'Cinzel',serif;font-size:14px;color:var(--text);margin-bottom:6px}
+.frame-price{font-size:13px;color:var(--gold);margin-bottom:12px}
+.frame-card.owned-equipped{border-color:var(--gold2);background:linear-gradient(160deg,#c8a84b14,#0d0a0688)}
+
+/* ═══ SCREEN: PROFILE EDIT ════════════════════════════════════════════════ */
+#profileScreen{padding:20px 0;align-items:center;justify-content:flex-start;gap:16px}
+.profile-box{width:100%;max-width:480px;padding:36px}
+.avatar-upload-area{text-align:center;margin-bottom:24px;cursor:pointer}
+.avatar-upload-area:hover .avatar-overlay{opacity:1}
+.avatar-overlay{
+  position:absolute;inset:0;border-radius:50%;
+  background:#00000077;display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .25s;font-size:20px;
+}
+
+/* ═══ SCREEN: LOBBY ════════════════════════════════════════════════════════ */
+#lobbyScreen{padding:16px 0;gap:14px}
+.lobby-header{padding:14px 20px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px}
+.lobby-title{font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--gold)}
+.lobby-body{flex:1;display:grid;grid-template-columns:1fr 300px;gap:14px;min-height:0}
+@media(max-width:660px){.lobby-body{grid-template-columns:1fr}}
+
+/* Players list */
+.players-section{padding:18px;display:flex;flex-direction:column;gap:12px}
+.player-slot{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;
+  border-radius:6px;border:1px solid #c8a84b1a;
+  background:#c8a84b08;transition:all .3s;
+}
+.player-slot.ready{border-color:#4a9e4a55;background:#2d6a2d12}
+.player-slot.empty{opacity:.4;border-style:dashed}
+.player-slot-name{flex:1;font-family:'Cinzel',serif;font-size:14px}
+.ready-badge{
+  font-size:11px;letter-spacing:.1em;padding:4px 10px;border-radius:20px;
+  font-family:'Cinzel',serif;
+}
+.ready-badge.yes{background:#2d6a2d22;color:#80ff80;border:1px solid #2d6a2d55}
+.ready-badge.no{background:#8b000022;color:#ff8080;border:1px solid #8b000055}
+
+.lobby-actions{margin-top:auto;display:flex;gap:10px;padding-top:12px}
+.lobby-actions .btn{flex:1}
+
+/* Chat */
+.chat-section{padding:16px;display:flex;flex-direction:column;height:100%}
+.chat-messages{
+  flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;
+  margin-bottom:12px;min-height:0;
+  scrollbar-width:thin;scrollbar-color:var(--gold3) transparent;
+}
+.chat-messages::-webkit-scrollbar{width:3px}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--gold3)}
+.chat-msg{font-size:13px;line-height:1.5}
+.chat-msg .chat-user{color:var(--gold);font-family:'Cinzel',serif;font-size:11px;margin-right:6px}
+.chat-msg .chat-text{color:var(--text)}
+.chat-input-wrap{display:flex;gap:8px}
+.chat-input{
+  flex:1;padding:9px 12px;background:#0d0a0688;border:1px solid #c8a84b2a;
+  border-radius:4px;color:var(--text);font-family:'Crimson Text',serif;font-size:14px;
+  outline:none;transition:border .2s;
+}
+.chat-input:focus{border-color:var(--gold)}
+
+/* ═══ SCREEN: GAME ════════════════════════════════════════════════════════ */
+#gameScreen{padding:12px 0;gap:10px}
+#gameScreen .screen-inner{
+  flex:1;display:grid;
+  grid-template-rows:auto 1fr auto;
+  gap:10px;min-height:0;overflow:hidden;
+}
+
+/* Game header */
+.game-header{
+  padding:12px 18px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  flex-wrap:wrap;
+}
+.g-players{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.g-player{display:flex;align-items:center;gap:8px;padding:6px 10px;
+  border-radius:5px;border:1px solid transparent;transition:all .4s}
+.g-player.active-turn{border-color:var(--gold);background:#c8a84b12;
+  animation:turnGlow 2s ease-in-out infinite}
+.g-player.eliminated{opacity:.3;filter:grayscale(1)}
+@keyframes turnGlow{0%,100%{box-shadow:0 0 8px #c8a84b33}50%{box-shadow:0 0 20px #c8a84b66}}
+.g-player-name{font-family:'Cinzel',serif;font-size:12px;color:var(--text)}
+.g-hp{display:flex;gap:3px}
+.g-hp-dot{width:12px;height:12px;border-radius:50%;
+  background:var(--blood2);border:1px solid var(--blood);
+  box-shadow:0 0 6px var(--blood2);transition:all .4s}
+.g-hp-dot.empty{background:var(--stone);border-color:var(--stone2);box-shadow:none}
+.turn-status{font-family:'Cinzel',serif;font-size:12px;letter-spacing:.1em;
+  padding:6px 14px;border-radius:20px;white-space:nowrap}
+.turn-status.mine{background:#c8a84b18;color:var(--gold2);border:1px solid #c8a84b44;
+  animation:turnGlow 2s ease-in-out infinite}
+.turn-status.wait{background:#ffffff08;color:var(--muted);border:1px solid #ffffff0f}
+
+/* Game body */
+.game-body{display:grid;grid-template-columns:1fr 260px;gap:10px;min-height:0;overflow:hidden}
+@media(max-width:700px){.game-body{grid-template-columns:1fr}}
+
+/* Table */
+.table-wrap{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:18px;padding:20px;border-radius:8px;position:relative;overflow:hidden;
+}
+.table-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 50% at 50% 50%,#c8a84b07,transparent);
+  pointer-events:none;
+}
+.table-top{
+  width:100%;max-width:440px;
+  background:linear-gradient(145deg,#2a1f0e,#1e1609,#2a1f0e);
+  border:2px solid #5a4010;border-radius:55% / 35%;
+  padding:36px 44px;position:relative;
+  box-shadow:0 20px 60px #00000099,inset 0 2px 0 #c8a84b22;
+  min-height:200px;display:flex;align-items:center;justify-content:center;
+}
+.table-top::before{content:'';position:absolute;inset:8px;
+  border:1px solid #5a401020;border-radius:inherit;pointer-events:none}
+.coin-count-lbl{
+  position:absolute;top:10px;right:16px;
+  font-family:'Cinzel',serif;font-size:11px;color:var(--muted2);letter-spacing:.1em
+}
+.coins-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:360px}
+.coin{
+  width:38px;height:38px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#f0d080,#c8a84b,#8a6520);
+  border:2px solid #8a6520;
+  box-shadow:0 3px 10px #00000066,inset 0 1px 0 #f0d08077,0 0 6px #c8a84b33;
+  transition:transform .3s;
+}
+.coin:hover{transform:translateY(-2px) scale(1.05)}
+.coin.dying{animation:coinDie .4s forwards}
+@keyframes coinDie{0%{transform:scale(1);opacity:1}50%{transform:scale(1.4) translateY(-16px);opacity:.7}100%{transform:scale(0) translateY(-50px);opacity:0}}
+.table-label{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  font-style:italic;font-size:11px;color:#4a3010;letter-spacing:.1em;white-space:nowrap}
+.take-area{display:flex;flex-direction:column;align-items:center;gap:10px}
+.take-label{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.take-btns{display:flex;gap:10px}
+.take-btn{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,#c8a84b1a,#c8a84b08);
+  border:1px solid var(--gold);color:var(--gold2);
+  font-family:'Cinzel Decorative',serif;font-size:18px;
+  cursor:pointer;transition:all .3s;
+  display:flex;align-items:center;justify-content:center;
+}
+.take-btn:hover:not(:disabled){
+  background:linear-gradient(135deg,#c8a84b44,#c8a84b1a);
+  box-shadow:0 0 20px #c8a84b44;transform:translateY(-3px);
+}
+.take-btn:active:not(:disabled){transform:scale(.93)}
+.take-btn:disabled{opacity:.25;cursor:not-allowed}
+
+/* Side panel */
+.game-side{display:flex;flex-direction:column;gap:10px;overflow-y:auto;
+  min-height:0;scrollbar-width:none}
+.game-side::-webkit-scrollbar{display:none}
+.side-sec{padding:14px;border-radius:6px}
+
+/* Cards */
+.my-cards{display:flex;flex-direction:column;gap:7px}
+.card-item{
+  padding:10px 12px;border-radius:5px;cursor:pointer;
+  background:linear-gradient(135deg,#2a1f0e,#1a1208);
+  border:1px solid #c8a84b2a;transition:all .25s;
+}
+.card-item:hover:not(.used):not(.locked){
+  border-color:var(--gold);box-shadow:0 0 16px #c8a84b22;transform:translateX(4px)
+}
+.card-item.used{opacity:.25;cursor:not-allowed;filter:grayscale(1)}
+.card-item.locked{cursor:not-allowed;opacity:.5}
+.card-head{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.card-ico{font-size:16px}.card-nm{font-family:'Cinzel',serif;font-size:11px;color:var(--gold)}
+.card-dsc{font-size:12px;color:var(--muted);font-style:italic;line-height:1.35}
+
+/* Opp cards */
+.opp-card-slots{display:flex;gap:6px}
+.opp-slot{
+  flex:1;height:56px;border-radius:5px;
+  background:linear-gradient(135deg,#1a0808,#0d0604);
+  border:1px solid #8b000022;display:flex;align-items:center;justify-content:center;
+  font-family:'Cinzel Decorative',serif;font-size:18px;color:#2a1010;
+}
+.opp-slot.used{opacity:.2;filter:grayscale(1)}
+
+/* Log */
+.game-log{flex:1;min-height:0;display:flex;flex-direction:column}
+.log-entries{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;
+  scrollbar-width:thin;scrollbar-color:var(--gold3) transparent}
+.log-entries::-webkit-scrollbar{width:3px}
+.log-entries::-webkit-scrollbar-thumb{background:var(--gold3)}
+.log-entry{font-size:12px;color:var(--muted);font-style:italic;
+  padding:5px 8px;border-left:2px solid #c8a84b1a;line-height:1.4;
+  animation:logIn .3s ease}
+.log-entry.new{color:var(--text);border-left-color:var(--gold)}
+@keyframes logIn{from{opacity:0;transform:translateX(6px)}to{opacity:1;transform:translateX(0)}}
+
+/* Game status bar */
+.game-bar{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.game-bar-msg{font-style:italic;font-size:14px;color:var(--muted)}
+.game-bar-msg.myturn{color:var(--gold2)}
+
+/* Greed warning */
+.greed-warn{
+  position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;
+  background:linear-gradient(135deg,#8b0000,#c0392b);
+  border:1px solid #ff000022;border-radius:20px;padding:8px 20px;
+  font-size:13px;color:#ffaaaa;
+  box-shadow:0 0 20px #8b000066;display:none;
+  animation:greedPop .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes greedPop{from{transform:translateX(-50%) scale(.5);opacity:0}to{transform:translateX(-50%) scale(1);opacity:1}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+
+<div id="app">
+
+<!-- ════════════════ AUTH ════════════════ -->
+<div id="authScreen" class="screen">
+<div class="panel panel-inner-border auth-box">
+  <span class="auth-crown">☽</span>
+  <h1 class="logo" style="font-size:26px;margin-bottom:4px">Cursed Coins</h1>
+  <p class="auth-subtitle">Игра судьбы и проклятых монет</p>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="authTab('login')">Войти</button>
+    <button class="auth-tab" onclick="authTab('register')">Регистрация</button>
+  </div>
+
+  <!-- Login -->
+  <div id="loginStep">
+    <div class="form-field"><label>Логин</label><input id="li_u" type="text" placeholder="Ваш псевдоним" autocomplete="username"/></div>
+    <div class="form-field"><label>Пароль</label><input id="li_p" type="password" placeholder="••••••••" autocomplete="current-password"/></div>
+    <button class="btn" style="width:100%;margin-top:4px" onclick="doLogin()">⚔ Войти в игру</button>
+  </div>
+
+  <!-- Register -->
+  <div id="registerStep" style="display:none">
+    <div class="form-field"><label>Логин</label><input id="re_u" type="text" placeholder="Псевдоним (мин 3 симв)" autocomplete="username"/></div>
+    <div class="form-field"><label>Email</label><input id="re_e" type="email" placeholder="your@email.com" autocomplete="email"/></div>
+    <div class="form-field"><label>Пароль</label><input id="re_p" type="password" placeholder="Минимум 4 символа" autocomplete="new-password"/></div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:8px">Аватарка (необязательно)</label>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="avatar-wrap" id="regAvatarWrap">
+          <img class="avatar-img" id="regAvatarPreview" src="" style="background:var(--stone);font-size:28px;line-height:52px;text-align:center" onerror="this.src=''"/>
+          <div style="position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;background:#00000055" onclick="document.getElementById('regAvatarInput').click()">📷</div>
+        </div>
+        <input type="file" id="regAvatarInput" accept="image/*" style="display:none" onchange="previewRegAvatar(event)"/>
+        <span style="font-size:13px;color:var(--muted);font-style:italic">Нажмите на круг, чтобы выбрать фото</span>
+      </div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:4px" onclick="doRegister()">🕯 Создать аккаунт</button>
+  </div>
+
+  <!-- Verify step -->
+  <div id="verifyStep">
+    <p style="color:var(--muted);font-style:italic;font-size:14px;margin-bottom:14px">Введите 6-значный код из письма</p>
+    <div class="code-inputs">
+      <input class="code-input" maxlength="1" id="c0" oninput="codeInput(0)"/>
+      <input class="code-input" maxlength="1" id="c1" oninput="codeInput(1)"/>
+      <input class="code-input" maxlength="1" id="c2" oninput="codeInput(2)"/>
+      <input class="code-input" maxlength="1" id="c3" oninput="codeInput(3)"/>
+      <input class="code-input" maxlength="1" id="c4" oninput="codeInput(4)"/>
+      <input class="code-input" maxlength="1" id="c5" oninput="codeInput(5)"/>
+    </div>
+    <button class="btn" style="width:100%;margin-top:8px" onclick="doVerify()">✓ Подтвердить</button>
+    <button class="btn sm danger" style="width:100%;margin-top:8px" onclick="doResend()">↻ Отправить снова</button>
+  </div>
+
+  <div id="authMsg" class="msg"></div>
+</div>
+</div>
+
+<!-- ════════════════ MENU ════════════════ -->
+<div id="menuScreen" class="screen">
+<div class="panel menu-header">
+  <div class="menu-user">
+    <div class="avatar-wrap" id="menuAvatarWrap">
+      <img class="avatar-img" id="menuAvatar" src="" onerror="this.style.background='var(--stone)'"/>
+      <div class="avatar-frame" id="menuAvatarFrame"></div>
+    </div>
+    <div class="menu-user-info">
+      <div class="username" id="menuUsername">—</div>
+      <div class="coins">🪙 <span id="menuCoins">0</span> монет</div>
+      <div style="color:var(--muted);font-size:12px" id="menuWL">0W / 0L</div>
+    </div>
+  </div>
+  <div class="menu-nav">
+    <button class="btn sm" onclick="showScreen('shopScreen');loadShop()">🛒 Магазин</button>
+    <button class="btn sm" onclick="showScreen('profileScreen')">⚙ Профиль</button>
+    <button class="btn sm danger" onclick="doLogout()">↩ Выйти</button>
+  </div>
+</div>
+
+<div class="menu-body">
+  <!-- Leaderboard -->
+  <div class="panel" style="padding:20px;display:flex;flex-direction:column;">
+    <div class="sec-title">🏆 Таблица лидеров</div>
+    <div class="lb-list" id="lbList"><div style="color:var(--muted);font-style:italic;font-size:14px;text-align:center;padding:30px">Загрузка...</div></div>
+  </div>
+
+  <!-- Right -->
+  <div class="menu-right">
+    <div class="panel play-btn-wrap">
+      <button class="btn" style="width:100%;padding:18px;font-size:15px;border-width:2px" onclick="enterLobby()">⚔ Войти в лобби</button>
+      <p>2 или 3 игрока — игра начнётся, когда все нажмут «Готов»</p>
+    </div>
+    <div class="panel" style="padding:16px">
+      <div class="sec-title">📖 Правила</div>
+      <div style="font-size:13px;color:var(--muted);font-style:italic;line-height:1.7">
+        На столе <b style="color:var(--text)">13 монет</b> (или 21 при 3 игроках).<br>
+        По очереди берите <b style="color:var(--text)">1, 2 или 3</b> монеты.<br>
+        Кто возьмёт <b style="color:var(--text)">последнюю</b> — получает урон.<br>
+        3 жизни. У кого кончатся — проигрывает.<br><br>
+        <b style="color:var(--gold)">Карты:</b><br>
+        👁 Жадность — соперник берёт +1<br>
+        🎩 Фокусник — вернуть монету на стол<br>
+        ⏭ Пропуск — передать ход сопернику
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════ SHOP ════════════════ -->
+<div id="shopScreen" class="screen">
+<div class="panel shop-header">
+  <h2 style="font-family:'Cinzel Decorative',serif;font-size:18px;color:var(--gold)">🛒 Магазин рамок</h2>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div class="shop-coins">🪙 <span id="shopCoins">0</span></div>
+    <button class="btn sm danger" onclick="showScreen('menuScreen');loadMenu()">↩ Назад</button>
+  </div>
+</div>
+<div class="panel" style="flex:1;padding:20px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--gold3) transparent">
+<div class="shop-grid" id="shopGrid"></div>
+</div>
+</div>
+
+<!-- ════════════════ PROFILE ════════════════ -->
+<div id="profileScreen" class="screen">
+<div class="panel" style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+  <h2 style="font-family:'Cinzel Decorative',serif;font-size:16px;color:var(--gold)">⚙ Профиль</h2>
+  <button class="btn sm danger" onclick="showScreen('menuScreen');loadMenu()">↩ Назад</button>
+</div>
+<div class="panel profile-box" style="width:100%;max-width:460px;padding:32px;margin:0 auto">
+  <!-- Avatar -->
+  <div style="text-align:center;margin-bottom:24px">
+    <div class="avatar-upload-area" onclick="document.getElementById('profileAvatarInput').click()" style="display:inline-block">
+      <div class="avatar-wrap" id="profileAvatarWrap">
+        <img class="avatar-img lg" id="profileAvatarImg" src="" onerror="this.style.background='var(--stone)'"/>
+        <div class="avatar-frame" id="profileAvatarFrame"></div>
+        <div class="avatar-overlay">📷</div>
+      </div>
+    </div>
+    <input type="file" id="profileAvatarInput" accept="image/*" style="display:none" onchange="uploadAvatar(event)"/>
+    <p style="color:var(--muted);font-size:12px;font-style:italic;margin-top:8px">Нажмите для смены аватара</p>
+  </div>
+  <div id="profileMsg" class="msg info" style="text-align:center;margin-bottom:14px"></div>
+  <!-- Frame selector -->
+  <div class="sec-title">Активная рамка</div>
+  <div id="profileFrames" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px"></div>
+  <button class="btn success" style="width:100%" onclick="saveProfile()">💾 Сохранить</button>
+</div>
+</div>
+
+<!-- ════════════════ LOBBY ════════════════ -->
+<div id="lobbyScreen" class="screen">
+<div class="panel lobby-header">
+  <div class="lobby-title">🕯 Комната ожидания</div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span id="lobbyCount" style="color:var(--muted);font-size:13px">0/3 игроков</span>
+    <button class="btn sm danger" onclick="leaveLobby()">↩ Выйти</button>
+  </div>
+</div>
+
+<div class="lobby-body">
+  <!-- Players -->
+  <div class="panel players-section">
+    <div class="sec-title">👥 Игроки</div>
+    <div id="lobbySlots"></div>
+    <div id="lobbyWaitMsg" style="color:var(--muted);font-style:italic;font-size:13px;margin-top:8px">Ожидаем игроков...</div>
+    <div class="lobby-actions">
+      <button class="btn success" id="readyBtn" onclick="setReady(true)">✓ Готов</button>
+      <button class="btn danger" id="unreadyBtn" onclick="setReady(false)" style="display:none">✗ Не готов</button>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="panel chat-section">
+    <div class="sec-title">💬 Чат лобби</div>
+    <div class="chat-messages" id="lobbyChat"></div>
+    <div class="chat-input-wrap">
+      <input class="chat-input" id="chatInput" placeholder="Написать..." maxlength="200"
+        onkeydown="if(event.key==='Enter')sendChat()"/>
+      <button class="btn sm" onclick="sendChat()">➤</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════ GAME ════════════════ -->
+<div id="gameScreen" class="screen">
+<div class="screen-inner">
+
+  <!-- Header -->
+  <div class="panel game-header">
+    <div class="g-players" id="gPlayers"></div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="turn-status" id="turnStatus">...</div>
+      <button class="btn sm danger" onclick="leaveGame()">✕</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="game-body">
+    <!-- Table -->
+    <div class="panel table-wrap">
+      <div class="table-top">
+        <div class="coin-count-lbl" id="coinCountLbl">13</div>
+        <div class="coins-grid" id="coinsGrid"></div>
+        <div class="table-label">Древний дубовый стол</div>
+      </div>
+      <div class="take-area">
+        <div class="take-label">Взять монеты</div>
+        <div class="take-btns">
+          <button class="take-btn" id="gb1" onclick="takeCoins(1)" disabled>1</button>
+          <button class="take-btn" id="gb2" onclick="takeCoins(2)" disabled>2</button>
+          <button class="take-btn" id="gb3" onclick="takeCoins(3)" disabled>3</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side -->
+    <div class="game-side">
+      <div class="panel side-sec">
+        <div class="sec-title">🃏 Мои карты</div>
+        <div class="my-cards" id="myCards"></div>
+      </div>
+      <div class="panel side-sec" id="oppCardsSection">
+        <div class="sec-title" id="oppCardsTitle">🔮 Карты соперника</div>
+        <div class="opp-card-slots" id="oppCardSlots"></div>
+      </div>
+      <div class="panel side-sec game-log" style="flex:1;min-height:120px">
+        <div class="sec-title">📜 Хроники</div>
+        <div class="log-entries" id="logEntries"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="panel game-bar">
+    <div class="game-bar-msg" id="gameBarMsg">...</div>
+  </div>
+
+</div><!-- .screen-inner -->
+</div>
+
+</div><!-- #app -->
+
+<!-- Overlays -->
+<div class="overlay" id="roundOverlay">
+<div class="overlay-box">
+  <span class="ov-icon" id="roundIcon">💀</span>
+  <div class="ov-title" id="roundTitle">Раунд окончен</div>
+  <div class="ov-sub" id="roundSub"></div>
+  <div class="ov-btns"><button class="btn success" onclick="nextRound()">⚔ Следующий раунд</button></div>
+</div>
+</div>
+
+<div class="overlay" id="gameOverOverlay">
+<div class="overlay-box">
+  <span class="ov-icon" id="gameOverIcon">🏆</span>
+  <div class="ov-title" id="gameOverTitle">Игра окончена</div>
+  <div class="ov-sub" id="gameOverSub"></div>
+  <div class="ov-btns">
+    <button class="btn" onclick="playAgain()">⚔ Играть снова</button>
+    <button class="btn danger" onclick="backToMenu()">↩ В меню</button>
+  </div>
+</div>
+</div>
+
+<div class="greed-warn" id="greedWarn">⚠ На вас «Жадность» — возьмёте на 1 монету больше!</div>
+
+<script>
+'use strict';
+// ═══════════════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════════════
+let S = {
+  token: localStorage.getItem('cc_tok')||'',
+  username: localStorage.getItem('cc_usr')||'',
+  profile: null,
+  myIndex: -1,
+  game: null,
+  lobby: null,
+  pendingRegUser: '',
+  pendingRegAvatar: '',
+  selectedFrame: '',
+};
+
+let evtSrc = null;
+let prevPhase = '';
+let prevCoins = 0;
+
+// ═══════════════════════════════════════════════════════════════════════
+//  BG
+// ═══════════════════════════════════════════════════════════════════════
+(()=>{
+  const bg=document.getElementById('bg');
+  [5,14,23,33,44,55,64,73,83,93].forEach(p=>{
+    const c=document.createElement('div');c.className='candle';
+    c.style.cssText=`left:${p}%;height:${55+Math.random()*90}px;animation-delay:${Math.random()*3}s;animation-duration:${2+Math.random()*2}s`;
+    bg.appendChild(c);
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════════════════
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>{
+    s.classList.remove('active');
+    s.style.display='';
+  });
+  const el=document.getElementById(id);
+  el.classList.add('active');
+  el.style.display='flex';
+}
+
+function toast(msg,dur=2800) {
+  const t=document.createElement('div');t.className='toast';t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(20px)';
+    t.style.transition='all .35s';setTimeout(()=>t.remove(),400)},dur);
+}
+
+async function api(path,body=null,method=null) {
+  const opts={headers:{'Authorization':'Bearer '+S.token}};
+  opts.method=method||(body?'POST':'GET');
+  if(body){opts.body=JSON.stringify(body);opts.headers['Content-Type']='application/json';}
+  try{const r=await fetch(path,opts);return r.json();}
+  catch(e){return{error:'Сеть недоступна'};}
+}
+
+function setMsg(id,msg,type='info') {
+  const el=document.getElementById(id);
+  el.className='msg '+type; el.textContent=msg;
+}
+
+function avatarSrc(av) {
+  if(!av)return'';
+  if(av.startsWith('data:'))return av;
+  return'';
+}
+
+function frameClass(frameId) {
+  return frameId?'frame-'+frameId:'';
+}
+
+function renderAvatar(wrapId,frameId,imgId,avatarB64,large=false) {
+  const wrap=document.getElementById(wrapId);
+  if(!wrap)return;
+  const img=document.getElementById(imgId);
+  if(img){
+    img.src=avatarB64||'';
+    img.style.background=avatarB64?'':' var(--stone)';
+    img.style.fontSize='28px';img.style.lineHeight=(large?80:52)+'px';
+    img.style.textAlign='center';
+    img.textContent=avatarB64?'':'👤';
+  }
+  wrap.className='avatar-wrap '+(frameId?'frame-'+frameId:'');
+  const fr=wrap.querySelector('.avatar-frame');
+  if(!fr){
+    const d=document.createElement('div');d.className='avatar-frame';wrap.appendChild(d);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SSE
+// ═══════════════════════════════════════════════════════════════════════
+function startSSE() {
+  if(evtSrc){evtSrc.close();}
+  evtSrc=new EventSource(`/events?token=${S.token}`);
+  evtSrc.onmessage=e=>{
+    let msg;try{msg=JSON.parse(e.data);}catch{return;}
+    if(msg.type==='state') handleGameState(msg.room,msg.myIndex);
+    else if(msg.type==='lobby') handleLobbyState(msg.lobby);
+    else if(msg.type==='opponent_left') {
+      toast('😱 Игрок '+msg.who+' покинул игру');
+      prevPhase='';S.game=null;
+      document.getElementById('roundOverlay').classList.remove('show');
+      document.getElementById('gameOverOverlay').classList.remove('show');
+      showScreen('menuScreen');loadMenu();
+    }
+  };
+  evtSrc.onerror=()=>{};
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  AUTH
+// ═══════════════════════════════════════════════════════════════════════
+function authTab(tab) {
+  document.getElementById('loginStep').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerStep').style.display=tab==='register'?'block':'none';
+  document.getElementById('verifyStep').style.display='none';
+  document.querySelectorAll('.auth-tab').forEach((b,i)=>
+    b.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1)));
+  setMsg('authMsg','');
+}
+
+function previewRegAvatar(e) {
+  const file=e.target.files[0];if(!file)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    S.pendingRegAvatar=ev.target.result;
+    const img=document.getElementById('regAvatarPreview');
+    img.src=ev.target.result;img.style.background='';
+  };r.readAsDataURL(file);
+}
+
+async function doRegister() {
+  const u=document.getElementById('re_u').value.trim();
+  const e=document.getElementById('re_e').value.trim();
+  const p=document.getElementById('re_p').value;
+  setMsg('authMsg','Отправляем код...','info');
+  const r=await api('/api/register',{username:u,password:p,email:e});
+  if(r.error){setMsg('authMsg',r.error,'err');return;}
+  S.pendingRegUser=u;
+  document.getElementById('registerStep').style.display='none';
+  document.getElementById('verifyStep').style.display='block';
+  setMsg('authMsg','Код отправлен на '+e,'ok');
+}
+
+function codeInput(idx) {
+  const v=document.getElementById('c'+idx).value;
+  if(v&&idx<5) document.getElementById('c'+(idx+1)).focus();
+}
+
+async function doVerify() {
+  const code=[0,1,2,3,4,5].map(i=>document.getElementById('c'+i).value).join('');
+  if(code.length!==6){setMsg('authMsg','Введите все 6 цифр','err');return;}
+  setMsg('authMsg','Проверяем...','info');
+  const r=await api('/api/verify',{username:S.pendingRegUser,code});
+  if(r.error){setMsg('authMsg',r.error,'err');return;}
+  // Upload avatar if present
+  if(S.pendingRegAvatar) {
+    // Login first to get token, then upload
+    setMsg('authMsg','Аккаунт создан! Теперь войдите.','ok');
+  } else {
+    setMsg('authMsg','Аккаунт создан! Теперь войдите.','ok');
+  }
+  document.getElementById('verifyStep').style.display='none';
+  document.getElementById('loginStep').style.display='block';
+  authTab('login');
+  document.getElementById('li_u').value=S.pendingRegUser;
+}
+
+async function doResend() {
+  const r=await api('/api/resend',{username:S.pendingRegUser});
+  if(r.error){setMsg('authMsg',r.error,'err');return;}
+  setMsg('authMsg','Код отправлен повторно','ok');
+}
+
+async function doLogin() {
+  const u=document.getElementById('li_u').value.trim();
+  const p=document.getElementById('li_p').value;
+  if(!u||!p){setMsg('authMsg','Заполните поля','err');return;}
+  setMsg('authMsg','Входим...','info');
+  const r=await api('/api/login',{username:u,password:p});
+  if(r.error){setMsg('authMsg',r.error,'err');return;}
+  S.token=r.token;S.username=r.username;S.profile=r.profile;
+  localStorage.setItem('cc_tok',S.token);localStorage.setItem('cc_usr',S.username);
+  // Upload pending avatar if any
+  if(S.pendingRegAvatar) {
+    await api('/api/avatar',{base64:S.pendingRegAvatar},'POST');
+    S.pendingRegAvatar='';
+  }
+  startSSE();
+  loadMenu();
+  showScreen('menuScreen');
+}
+
+function doLogout() {
+  S.token='';S.username='';S.profile=null;
+  localStorage.removeItem('cc_tok');localStorage.removeItem('cc_usr');
+  if(evtSrc){evtSrc.close();evtSrc=null;}
+  showScreen('authScreen');
+  authTab('login');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  MENU
+// ═══════════════════════════════════════════════════════════════════════
+async function loadMenu() {
+  // Profile
+  const pr=await api('/api/profile');
+  if(pr.profile) {
+    S.profile=pr.profile;
+    document.getElementById('menuUsername').textContent=S.username;
+    document.getElementById('menuCoins').textContent=pr.profile.coins||0;
+    document.getElementById('menuWL').textContent=`${pr.profile.wins||0}W / ${pr.profile.losses||0}L`;
+    renderAvatar('menuAvatarWrap','menuAvatarFrame','menuAvatar',pr.profile.avatar);
+    // Fix: set frame class on wrap
+    const wrap=document.getElementById('menuAvatarWrap');
+    wrap.className='avatar-wrap '+(pr.profile.activeFrame?'frame-'+pr.profile.activeFrame:'');
+  }
+  // Leaderboard
+  loadLeaderboard();
+}
+
+async function loadLeaderboard() {
+  const r=await api('/api/leaderboard');
+  const list=document.getElementById('lbList');
+  if(!r.board||!r.board.length){list.innerHTML='<div style="color:var(--muted);font-style:italic;text-align:center;padding:30px">Пока никого нет</div>';return;}
+  list.innerHTML=r.board.map((p,i)=>{
+    const rankClass=i===0?'r1':i===1?'r2':i===2?'r3':'';
+    const medals=['🥇','🥈','🥉'];
+    const medal=i<3?medals[i]:i+1;
+    return `<div class="lb-row">
+      <div class="lb-rank ${rankClass}">${medal}</div>
+      <div class="avatar-wrap ${p.activeFrame?'frame-'+p.activeFrame:''}" style="flex-shrink:0">
+        <img class="avatar-img" src="${p.avatar||''}" onerror="this.style.background='var(--stone)'" style="width:32px;height:32px"/>
+        <div class="avatar-frame"></div>
+      </div>
+      <div class="lb-name">${p.username}${p.username===S.username?' <span style="color:var(--muted);font-size:11px">(вы)</span>':''}</div>
+      <div class="lb-wins">🏆 ${p.wins}</div>
+      <div class="lb-coins">🪙 ${p.coins}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  SHOP
+// ═══════════════════════════════════════════════════════════════════════
+async function loadShop() {
+  const [framesRes,profRes]=await Promise.all([api('/api/shop/frames'),api('/api/profile')]);
+  if(profRes.profile){S.profile=profRes.profile;document.getElementById('shopCoins').textContent=profRes.profile.coins||0;}
+  const owned=S.profile?S.profile.frames||[]:[];
+  const active=S.profile?S.profile.activeFrame||'':'';
+  const frames=framesRes.frames||[];
+  const gradients={
+    silver:'linear-gradient(135deg,#c0c0c0,#e8e8e8,#a0a0a0)',
+    gold:'linear-gradient(135deg,#c8a84b,#f0d080,#8a6520)',
+    blood:'linear-gradient(135deg,#8b0000,#c0392b,#6a0000)',
+    arcane:'linear-gradient(135deg,#6d28d9,#8b5cf6,#4c1d95)',
+    inferno:'linear-gradient(135deg,#c2410c,#f97316,#7c2d12)',
+    void:'linear-gradient(135deg,#0e7490,#06b6d4,#164e63)',
+  };
+  const grid=document.getElementById('shopGrid');
+  grid.innerHTML=frames.map(f=>{
+    const isOwned=owned.includes(f.id);
+    const isActive=active===f.id;
+    return `<div class="frame-card${isActive?' owned-equipped':''}" onclick="shopAction('${f.id}',${isOwned})">
+      <div class="frame-preview">
+        <span>☽</span>
+        <div class="ring" style="background:${gradients[f.id]||'var(--gold)'};-webkit-mask:radial-gradient(circle at 50% 50%,transparent 40%,black 40%)"></div>
+      </div>
+      <div class="frame-name">${f.name}</div>
+      <div class="frame-price">${isOwned?(isActive?'✓ Активна':'Куплено ✓'):'🪙 '+f.price}</div>
+      <div style="margin-top:8px">
+        ${isOwned&&!isActive?`<button class="btn sm success" onclick="event.stopPropagation();equipFrame('${f.id}')">Надеть</button>`:''}
+        ${!isOwned?`<button class="btn sm" onclick="event.stopPropagation();buyFrame('${f.id}',${f.price})">Купить</button>`:''}
+        ${isActive?`<button class="btn sm danger" onclick="event.stopPropagation();equipFrame('')">Снять</button>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function buyFrame(id,price) {
+  if(!confirm(`Купить рамку за 🪙 ${price}?`))return;
+  const r=await api('/api/shop/buy',{frameId:id});
+  if(r.error){toast('⚠ '+r.error);return;}
+  S.profile.coins=r.coins;S.profile.frames=r.frames;
+  document.getElementById('shopCoins').textContent=r.coins;
+  toast('✓ Рамка куплена!');loadShop();
+}
+
+async function equipFrame(id) {
+  const r=await api('/api/shop/equip',{frameId:id});
+  if(r.error){toast('⚠ '+r.error);return;}
+  if(S.profile)S.profile.activeFrame=id;
+  toast(id?'✓ Рамка надета!':'Рамка снята');loadShop();
+}
+
+function shopAction(id,isOwned) {
+  // click on card itself does nothing extra
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  PROFILE EDIT
+// ═══════════════════════════════════════════════════════════════════════
+async function loadProfileScreen() {
+  const r=await api('/api/profile');
+  if(r.profile){
+    S.profile=r.profile;
+    const img=document.getElementById('profileAvatarImg');
+    img.src=r.profile.avatar||'';
+    img.style.background=r.profile.avatar?'':'var(--stone)';
+    const wrap=document.getElementById('profileAvatarWrap');
+    wrap.className='avatar-wrap '+(r.profile.activeFrame?'frame-'+r.profile.activeFrame:'');
+    S.selectedFrame=r.profile.activeFrame||'';
+  }
+  // Render owned frames selector
+  const owned=S.profile?S.profile.frames||[]:[];
+  const active=S.profile?S.profile.activeFrame||'':'';
+  const pf=document.getElementById('profileFrames');
+  pf.innerHTML=[''].concat(owned).map(id=>{
+    const label=id?id.charAt(0).toUpperCase()+id.slice(1):'Нет';
+    return `<div onclick="selectProfileFrame('${id}')" style="padding:8px 14px;border-radius:4px;cursor:pointer;
+      border:1px solid ${S.selectedFrame===id?'var(--gold)':'#c8a84b22'};
+      background:${S.selectedFrame===id?'#c8a84b18':'transparent'};
+      font-family:Cinzel,serif;font-size:12px;color:var(--text);transition:all .2s" id="pf_${id}">
+      ${label}
+    </div>`;
+  }).join('');
+}
+
+function selectProfileFrame(id) {
+  S.selectedFrame=id;
+  const wrap=document.getElementById('profileAvatarWrap');
+  wrap.className='avatar-wrap '+(id?'frame-'+id:'');
+  document.querySelectorAll('[id^="pf_"]').forEach(el=>{
+    const sel=el.id==='pf_'+id;
+    el.style.borderColor=sel?'var(--gold)':'#c8a84b22';
+    el.style.background=sel?'#c8a84b18':'transparent';
+  });
+}
+
+async function uploadAvatar(e) {
+  const file=e.target.files[0];if(!file)return;
+  setMsg('profileMsg','Загружаем...','info');
+  const r=new FileReader();
+  r.onload=async ev=>{
+    const b64=ev.target.result;
+    const res=await api('/api/avatar',{base64:b64});
+    if(res.error){setMsg('profileMsg',res.error,'err');return;}
+    document.getElementById('profileAvatarImg').src=b64;
+    document.getElementById('profileAvatarImg').style.background='';
+    setMsg('profileMsg','Аватар обновлён!','ok');
+    if(S.profile)S.profile.avatar=b64;
+  };r.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  const r=await api('/api/shop/equip',{frameId:S.selectedFrame});
+  if(r.error){setMsg('profileMsg',r.error,'err');return;}
+  if(S.profile)S.profile.activeFrame=S.selectedFrame;
+  setMsg('profileMsg','Профиль сохранён!','ok');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  LOBBY
+// ═══════════════════════════════════════════════════════════════════════
+async function enterLobby() {
+  const r=await api('/api/lobby/join',{});
+  if(r.error){toast('⚠ '+r.error);return;}
+  showScreen('lobbyScreen');
+  if(r.lobby) handleLobbyState(r.lobby);
+}
+
+async function leaveLobby() {
+  await api('/api/lobby/leave',{});
+  showScreen('menuScreen');loadMenu();
+}
+
+async function setReady(ready) {
+  const r=await api(ready?'/api/lobby/ready':'/api/lobby/unready',{});
+  if(r.error){toast('⚠ '+r.error);return;}
+  document.getElementById('readyBtn').style.display=ready?'none':'block';
+  document.getElementById('unreadyBtn').style.display=ready?'block':'none';
+}
+
+async function sendChat() {
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();if(!text)return;
+  inp.value='';
+  const r=await api('/api/lobby/chat',{text});
+  if(r.error)toast('⚠ '+r.error);
+}
+
+function handleLobbyState(lobby) {
+  if(!lobby)return;
+  S.lobby=lobby;
+  // If on menu screen and got lobby, switch to lobby
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id!=='lobbyScreen'&&cur.id!=='gameScreen') showScreen('lobbyScreen');
+
+  // Count
+  document.getElementById('lobbyCount').textContent=lobby.players.length+'/3 игроков';
+
+  // Wait msg
+  const waitEl=document.getElementById('lobbyWaitMsg');
+  waitEl.textContent=lobby.players.length<2?'Ждём минимум 2 игроков...':
+    lobby.players.length===lobby.players.filter(p=>p.ready).length?'Все готовы! Игра начнётся...':'Ждём когда все нажмут «Готов»';
+
+  // Slots
+  const slots=document.getElementById('lobbySlots');
+  let html='';
+  for(let i=0;i<3;i++){
+    const p=lobby.players[i];
+    if(p){
+      html+=`<div class="player-slot${p.ready?' ready':''}">
+        <div class="avatar-wrap${p.activeFrame?' frame-'+p.activeFrame:''}" style="flex-shrink:0">
+          <img class="avatar-img" src="${p.avatar||''}" style="width:40px;height:40px;${!p.avatar?'background:var(--stone)':''}" onerror="this.style.background='var(--stone)'"/>
+          <div class="avatar-frame"></div>
+        </div>
+        <span class="player-slot-name">${p.username}${p.username===S.username?' (вы)':''}</span>
+        <span class="ready-badge ${p.ready?'yes':'no'}">${p.ready?'Готов':'Не готов'}</span>
+      </div>`;
+    } else {
+      html+=`<div class="player-slot empty" style="height:60px;justify-content:center;color:var(--muted);font-style:italic;font-size:13px">Ожидание...</div>`;
+    }
+  }
+  slots.innerHTML=html;
+
+  // Chat
+  const chatEl=document.getElementById('lobbyChat');
+  const msgs=lobby.chat||[];
+  chatEl.innerHTML=msgs.map(m=>{
+    const t=new Date(m.time).toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    return `<div class="chat-msg"><span class="chat-user">[${t}] ${m.user}:</span><span class="chat-text">${escHtml(m.text)}</span></div>`;
+  }).join('');
+  chatEl.scrollTop=chatEl.scrollHeight;
+}
+
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  GAME
+// ═══════════════════════════════════════════════════════════════════════
+function handleGameState(room,myIndex) {
+  S.game=room;S.myIndex=myIndex;
+  const cur=document.querySelector('.screen.active');
+  if(cur&&cur.id!=='gameScreen') showScreen('gameScreen');
+
+  // Overlays
+  if(prevPhase!=='roundEnd'&&room.phase==='roundEnd') showRoundOverlay(room);
+  if(prevPhase!=='gameOver'&&room.phase==='gameOver') showGameOverOverlay(room);
+  if(prevPhase==='roundEnd'&&room.phase==='playing') {
+    document.getElementById('roundOverlay').classList.remove('show');
+  }
+  prevPhase=room.phase;
+
+  renderGame(room,myIndex);
+}
+
+function renderGame(room,myIndex) {
+  const n=room.players.length;
+  const oppIdx=n===2?[1-myIndex]:[0,1,2].filter(i=>i!==myIndex);
+  const isMyTurn=room.currentTurn===myIndex&&room.phase==='playing';
+  const isElim=room.eliminated&&room.eliminated.includes(myIndex);
+
+  // Header: players
+  const gp=document.getElementById('gPlayers');
+  const db_avatars={}; // we don't have avatars in game state, that's ok
+  gp.innerHTML=room.players.map((p,i)=>{
+    const active=room.currentTurn===i&&room.phase==='playing';
+    const elim=room.eliminated&&room.eliminated.includes(i);
+    return `<div class="g-player${active?' active-turn':''}${elim?' eliminated':''}">
+      <div>
+        <div class="g-player-name">${p}${p===S.username?' (вы)':''}</div>
+        <div class="g-hp">${Array.from({length:3},(_,j)=>`<div class="g-hp-dot${j>=room.hp[i]?' empty':''}"></div>`).join('')}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Turn status
+  const ts=document.getElementById('turnStatus');
+  ts.className='turn-status '+(isMyTurn?'mine':'wait');
+  ts.textContent=isMyTurn?'⚔ Ваш ход':room.phase==='playing'?`Ход: ${room.players[room.currentTurn]}`:'...';
+
+  // Coins
+  renderCoins(room.coins);
+  document.getElementById('coinCountLbl').textContent=room.coins+' монет'+coinSuf(room.coins);
+
+  // Take buttons
+  const canTake=isMyTurn&&!isElim&&room.phase==='playing';
+  [1,2,3].forEach(n=>{
+    const b=document.getElementById('gb'+n);
+    b.disabled=!canTake||room.coins<n;
+  });
+
+  // My cards
+  renderMyCards(room.cards[myIndex],isMyTurn&&!isElim&&room.phase==='playing');
+
+  // Opp cards (show slots for each opp)
+  const oppSec=document.getElementById('oppCardsSection');
+  if(n===2){
+    document.getElementById('oppCardsTitle').textContent='🔮 Карты '+room.players[oppIdx[0]];
+    document.getElementById('oppCardSlots').innerHTML=
+      room.cards[oppIdx[0]].map(c=>`<div class="opp-slot${c===null?' used':''}">?</div>`).join('');
+  } else {
+    // 3p: show all opponents stacked
+    document.getElementById('oppCardsTitle').textContent='🔮 Карты соперников';
+    document.getElementById('oppCardSlots').innerHTML=oppIdx.map(i=>
+      `<div style="flex:1">
+        <div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-family:Cinzel,serif">${room.players[i]}</div>
+        <div style="display:flex;gap:4px">${room.cards[i].map(c=>`<div class="opp-slot${c===null?' used':''}">?</div>`).join('')}</div>
+      </div>`
+    ).join('');
+  }
+
+  // Log
+  const le=document.getElementById('logEntries');
+  const entries=room.log.slice(-25);
+  le.innerHTML=entries.map((e,i)=>
+    `<div class="log-entry${i===entries.length-1?' new':''}">${escHtml(e)}</div>`
+  ).join('');
+  le.scrollTop=le.scrollHeight;
+
+  // Status bar
+  const bar=document.getElementById('gameBarMsg');
+  bar.className='game-bar-msg'+(isMyTurn?' myturn':'');
+  bar.textContent=isMyTurn?'Возьмите монеты или сыграйте карту':
+    room.phase==='playing'?`Ход игрока ${room.players[room.currentTurn]}...`:
+    room.phase==='roundEnd'?'Раунд окончен':'Игра завершена';
+
+  // Greed warning
+  const gw=document.getElementById('greedWarn');
+  gw.style.display=(room.pendingGreed&&room.greedTarget===myIndex)?'block':'none';
+
+  prevCoins=room.coins;
+}
+
+function renderCoins(count) {
+  const grid=document.getElementById('coinsGrid');
+  const cur=grid.querySelectorAll('.coin:not(.dying)').length;
+  if(cur===count)return;
+  if(count<cur){
+    const toKill=cur-count;
+    const coins=Array.from(grid.querySelectorAll('.coin:not(.dying)'));
+    for(let i=0;i<Math.min(toKill,coins.length);i++){
+      coins[coins.length-1-i].classList.add('dying');
+    }
+    setTimeout(()=>buildCoins(count),420);
+  } else {
+    buildCoins(count);
+  }
+}
+function buildCoins(count) {
+  const grid=document.getElementById('coinsGrid');
+  grid.innerHTML='';
+  for(let i=0;i<count;i++){
+    const c=document.createElement('div');c.className='coin';
+    c.style.animationDelay=(i*.02)+'s';
+    grid.appendChild(c);
+  }
+}
+
+const CARD_DATA={
+  greed:{ico:'👁',nm:'Жадность',dsc:'Соперник возьмёт +1 монету'},
+  magician:{ico:'🎩',nm:'Фокусник',dsc:'Вернуть 1 монету на стол'},
+  skip:{ico:'⏭',nm:'Пропуск',dsc:'Передать ход сопернику'},
+};
+
+function renderMyCards(cards,canPlay) {
+  const mc=document.getElementById('myCards');
+  mc.innerHTML=cards.map((card,i)=>{
+    const d=card?CARD_DATA[card]:{ico:'✗',nm:'Использована',dsc:''};
+    const cls=!card?'used':!canPlay?'locked':'';
+    return `<div class="card-item ${cls}" onclick="${card&&canPlay?`playCard(${i})`:''}" style="${card&&canPlay?'':'pointer-events:none'}">
+      <div class="card-head"><span class="card-ico">${d.ico}</span><span class="card-nm">${d.nm}</span></div>
+      <div class="card-dsc">${d.dsc}</div>
+    </div>`;
+  }).join('');
+}
+
+function coinSuf(n){return n===1?'а':n<5?'ы':''}
+
+// ── Actions ──────────────────────────────────────────────────────────────────
+async function takeCoins(n) {
+  const r=await api('/api/action',{action:'take',value:n});
+  if(r.error)toast('⚠ '+r.error);
+}
+async function playCard(idx) {
+  const r=await api('/api/action',{action:'card',value:idx});
+  if(r.error)toast('⚠ '+r.error);
+}
+
+// ── Round/Game overlays ───────────────────────────────────────────────────────
+function showRoundOverlay(room) {
+  const myWon=room.roundWinner===S.myIndex;
+  document.getElementById('roundIcon').textContent=myWon?'😈':'💀';
+  document.getElementById('roundTitle').textContent=myWon?'Раунд ваш!':'Раунд проигран';
+  document.getElementById('roundSub').textContent=myWon
+    ?`Соперник взял последнюю монету! HP соперника: ${room.hp[room.roundWinner===0?1:0]}`
+    :`Вы взяли последнюю монету. Ваше HP: ${room.hp[S.myIndex]}`;
+  document.getElementById('roundOverlay').classList.add('show');
+}
+
+function showGameOverOverlay(room) {
+  const myWon=room.gameWinner===S.myIndex;
+  const n=room.players.length;
+  let sub='';
+  if(n===3&&room.placement&&room.placement.length) {
+    sub=room.placement.map((p,i)=>`${i+1}. ${p} — ${i===0?'🪙 +100':i===1?'🪙 +50':'🪙 +0'}`).join('\n');
+  } else {
+    sub=myWon?`Вы сокрушили ${room.players[1-S.myIndex]}! +100 монет`:`${room.players[room.gameWinner]} победил.`;
+  }
+  document.getElementById('gameOverIcon').textContent=myWon?'🏆':'☠';
+  document.getElementById('gameOverTitle').textContent=myWon?'Победа!':'Поражение';
+  document.getElementById('gameOverSub').style.whiteSpace='pre-line';
+  document.getElementById('gameOverSub').textContent=sub;
+  document.getElementById('roundOverlay').classList.remove('show');
+  document.getElementById('gameOverOverlay').classList.add('show');
+}
+
+async function nextRound() {
+  document.getElementById('roundOverlay').classList.remove('show');
+  await api('/api/nextround',{});
+}
+
+async function playAgain() {
+  document.getElementById('gameOverOverlay').classList.remove('show');
+  await api('/api/game/leave',{});
+  S.game=null;prevPhase='';S.myIndex=-1;
+  await enterLobby();
+}
+
+async function backToMenu() {
+  document.getElementById('gameOverOverlay').classList.remove('show');
+  document.getElementById('roundOverlay').classList.remove('show');
+  await api('/api/game/leave',{});
+  S.game=null;prevPhase='';S.myIndex=-1;
+  showScreen('menuScreen');loadMenu();
+}
+
+async function leaveGame() {
+  if(!confirm('Покинуть игру?'))return;
+  await api('/api/game/leave',{});
+  S.game=null;prevPhase='';S.myIndex=-1;
+  document.getElementById('gameOverOverlay').classList.remove('show');
+  document.getElementById('roundOverlay').classList.remove('show');
+  showScreen('menuScreen');loadMenu();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════════════════
+(async function init(){
+  // Init coins grid
+  buildCoins(13);
+
+  if(S.token&&S.username){
+    startSSE();
+    showScreen('menuScreen');
+    await loadMenu();
+  } else {
+    showScreen('authScreen');
+  }
+
+  // Navigate to profile screen and load it
+  const origProfile=showScreen;
+  window._goProfile=()=>{showScreen('profileScreen');loadProfileScreen();};
+})();
+
+// Hook profile nav button
+document.querySelectorAll('.btn').forEach(b=>{
+  if(b.getAttribute('onclick')==="showScreen('profileScreen')"){
+    b.setAttribute('onclick',"showScreen('profileScreen');loadProfileScreen()");
+  }
+});
+</script>
+</body>
+</html>
